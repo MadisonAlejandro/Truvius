@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>truvius – AI-Powered CRM for Real Estate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #05070f;
+            color: #eef2ff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 动态3D背景层 */
+        .bg-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 30% 10%, #0a0f1f, #020408);
+        }
+
+        .bg-3d::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: repeating-linear-gradient(45deg, rgba(43,110,255,0.02) 0px, rgba(43,110,255,0.02) 2px, transparent 2px, transparent 8px);
+            transform: rotate(15deg);
+            animation: slowDrift 40s infinite linear;
+        }
+
+        .bg-3d::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 40% 60%, rgba(43,110,255,0.1) 0%, transparent 60%);
+            animation: breathe 12s infinite alternate;
+        }
+
+        @keyframes slowDrift {
+            0% { transform: rotate(15deg) translate(0,0); }
+            100% { transform: rotate(15deg) translate(3%, 2%); }
+        }
+
+        @keyframes breathe {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        /* 浮动几何体 */
+        .floating-shape {
+            position: fixed;
+            background: rgba(43,110,255,0.1);
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .shape1 {
+            width: 40vw;
+            height: 40vw;
+            bottom: -10vw;
+            left: -10vw;
+            animation: float1 25s infinite alternate;
+        }
+        .shape2 {
+            width: 30vw;
+            height: 30vw;
+            top: 20vh;
+            right: -10vw;
+            background: rgba(100, 150, 255, 0.1);
+            animation: float2 30s infinite alternate;
+        }
+        @keyframes float1 {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.2); }
+        }
+        @keyframes float2 {
+            0% { transform: translate(0,0) rotate(0deg); }
+            100% { transform: translate(-8%, 8%) rotate(10deg); }
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(105deg, #2b6eff, #1d4ed8);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 40px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(105deg, #3b7aff, #2563eb);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #2b6eff;
+            color: #2b6eff;
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: rgba(43, 110, 255, 0.1);
+            color: white;
+            border-color: white;
+        }
+
+        header {
+            background: rgba(5, 7, 15, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(43, 110, 255, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .logo a {
+            font-size: 1.9rem;
+            font-weight: 800;
+            text-decoration: none;
+            background: linear-gradient(135deg, #fff, #7aa2f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #cdd9ff;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #3b82f6;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-links {
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: rgba(10, 12, 25, 0.95);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                border-bottom: 1px solid #2b6eff40;
+            }
+            .nav-links.show {
+                max-height: 380px;
+                padding: 24px 0;
+            }
+            .nav-links li {
+                text-align: center;
+                padding: 12px 0;
+            }
+            .container {
+                padding: 0 24px;
+            }
+        }
+
+        section {
+            padding: 100px 0;
+        }
+        .section-title {
+            font-size: 2.6rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(145deg, #fff, #92b9ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 16px;
+        }
+        .section-sub {
+            text-align: center;
+            color: #9ca3cf;
+            max-width: 720px;
+            margin: 0 auto 56px;
+            font-size: 1.2rem;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+        .card {
+            background: rgba(18, 22, 40, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 32px;
+            border: 1px solid rgba(43, 110, 255, 0.3);
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: #2b6eff;
+            transform: translateY(-6px);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #2b6eff;
+            margin-bottom: 24px;
+        }
+        .hero {
+            padding: 80px 0 100px;
+        }
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+        .hero-content {
+            flex: 1;
+        }
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .hero-content p {
+            font-size: 1.2rem;
+            color: #b9c3f0;
+            margin-bottom: 36px;
+        }
+        .hero-visual {
+            flex: 1;
+            text-align: center;
+        }
+        .hero-visual img {
+            max-width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 25px 40px -12px black;
+        }
+        footer {
+            background: rgba(3, 5, 12, 0.8);
+            border-top: 1px solid #2b6eff30;
+            padding: 56px 0 32px;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+        .footer-col p, .footer-col a {
+            color: #9ca3cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .footer-col a:hover {
+            color: #3b82f6;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #1e2342;
+            font-size: 0.85rem;
+            color: #6c729b;
+        }
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.2rem; }
+            section { padding: 70px 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-3d"></div>
+<div class="floating-shape shape1"></div>
+<div class="floating-shape shape2"></div>
+
+<header>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo"><a href="index.html">truvius</a></div>
+            <button class="menu-toggle" id="mobileToggle"><i class="fas fa-bars"></i></button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="demo.html">Demo</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <h1>The AI-Powered CRM <br>Built for Real Estate Agents</h1>
+                <p>Designed by agents, for agents — truvius revolutionizes your workflow with dual AI, smart matching, and a fully integrated ecosystem. Stop data entry, start closing deals.</p>
+                <div class="hero-buttons">
+                    <a href="demo.html" class="btn">Request Demo <i class="fas fa-arrow-right"></i></a>
+                    <a href="features.html" class="btn btn-outline">Explore Features</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="AI CRM Dashboard">
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">Traditional CRM slows you down.<br>It’s time to change the game.</h2>
+            <p class="section-sub">truvius eliminates manual work, automates tedious tasks, and gives you back time to focus on what matters — your clients.</p>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="feature-icon"><i class="fas fa-microphone-alt"></i></div>
+                    <h3>Voice-Powered Intelligence</h3>
+                    <p>Convert voice notes into tasks, meeting summaries, and property reports. Propfy App transcribes everything in real time.</p>
+                </div>
+                <div class="card">
+                    <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                    <h3>Smart Scraping & Auto-Match</h3>
+                    <p>Instant access to market listings. AI matches properties with buyers and sends instant alerts.</p>
+                </div>
+                <div class="card">
+                    <div class="feature-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <h3>Kanban & Smart Tasks</h3>
+                    <p>Visual pipeline control + automated task suggestions based on your priorities.</p>
+                </div>
+                <div class="card">
+                    <div class="feature-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h3>All-in-One Ecosystem</h3>
+                    <p>From lead generation to commission management — one centralized platform prevents data loss.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3 style="color:white;">truvius</h3>
+                <p>AI-powered CRM built for agents, by agents.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <p><i class="fas fa-envelope"></i> support@truvius.xyz</p>
+                <p><i class="fas fa-envelope"></i> hello@truvius.xyz</p>
+                <p><i class="fas fa-map-marker-alt"></i> Humberto 1º 1901, Córdoba, Argentina</p>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 truvius — Smarter CRM for Real Estate Professionals.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // 移动端菜单
+    const toggleBtn = document.getElementById('mobileToggle');
+    const navMenu = document.getElementById('navLinks');
+    if(toggleBtn && navMenu) {
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navMenu.classList.toggle('show');
+            const icon = toggleBtn.querySelector('i');
+            if(navMenu.classList.contains('show')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('show');
+                if(toggleBtn.querySelector('i')) {
+                    toggleBtn.querySelector('i').classList.remove('fa-times');
+                    toggleBtn.querySelector('i').classList.add('fa-bars');
+                }
+            });
+        });
+    }
+    // 高亮当前导航（基于文件名）
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        const href = link.getAttribute('href');
+        if(href === currentPage) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+</script>
+</body>
+</html>
